@@ -28,4 +28,4 @@ Jarvis, the director's interface. Talks with the director, shapes each job with 
 ## Where things are
 - NOW.md: the next job at HQ. docs/TEAM.md: the team and how to recruit. desk/ and board/: their READMEs.
 - Labs: labs/<lab>/ (a child lab under its parent), each its own repo, listed in .claude/labs.list.
-- The dashboard: node dashboard/serve.mjs, then http://localhost:4800 (Desk, Board, Team).
+- The dashboard: node dashboard/serve.mjs, then http://localhost:4800 (Home, Desk, Board).

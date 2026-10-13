@@ -12,7 +12,8 @@ It is plain files, a few hooks and one small dashboard. No database, no packages
 | **Jarvis** | Your interface. A session opened at the root is Jarvis: it talks with you, shapes each job, hands it to the right role | `CLAUDE.md` ("## Role") |
 | **Roles and labs** | A role is a name you talk to; its lab is its folder (and its own git repo). A session opened in a lab is that role. A lab knows down, never up | `labs/<lab>/`, `docs/TEAM.md` |
 | **The desk** | Decisions waiting on you, one card each, with a picture. You tap Keep, Wrong, Later (or Done, Problem on a task) | `desk/`, Desk tab |
-| **The board** | The list of jobs: pinned, taken, done, needs you | `board/`, Board tab |
+| **The board** | The list of jobs: pinned, taken, done, needs you. Pin a job or answer one from the page | `board/`, Board tab |
+| **The dashboard** | Home (Jarvis, the team, what needs you), Desk, Board. Restyle it in one file | `dashboard/` |
 | **The hooks** | Start: who this session is, the next job, what you answered. End: save the notes. Nudge: twenty turns with nothing kept gets said out loud | `.claude/hooks/` |
 
 Every lab has the same notes: `CLAUDE.md` (who works here, how to run it), `NOW.md` (what is true today, the one next step), `DECISIONS.md` (what you kept, in your words), `LESSONS.md` (dated lines not to relearn). The ideas behind it: `docs/TEAM.md`.
@@ -35,11 +36,32 @@ node setup.mjs --director "Your Name" --owner your-github-user --runs "what you 
 
 Leave out `--owner` to keep every lab on your machine only. Setup unhooks this copy from the kit's repo, so your notes never go back to it.
 
+## See it first
+
+To see a full HQ before setting up your own, fill a throwaway copy with an example team (Tony Stark, Reed Richards, Peter Parker) and their cards:
+
+```bash
+node tools/demo.mjs
+```
+
+```bash
+node dashboard/serve.mjs
+```
+
+Open http://localhost:4800. **Home** shows Jarvis, the team and what needs you; **Desk** holds the decisions; **Board** holds the jobs. Recruit a role or pin a job straight from the page.
+
+## Make it look like yours
+
+- **Colours, font, corners:** `dashboard/theme.css`, the block at the top.
+- **The name in the header:** `"name"` in `hq.json` (or `node setup.mjs --name "Stark Tower"`).
+- **A role's picture:** a square image at `dashboard/avatars/<name>.png` (`tony-stark.png`). Without one, the page shows initials.
+- **The page itself:** `dashboard/index.html`, plain HTML and JavaScript, no build step.
+
 ## Five minutes, end to end
 
 1. **Open the dashboard.** In one terminal, run `node dashboard/serve.mjs`, then open http://localhost:4800. The desk is empty.
 2. **Talk to Jarvis.** Open Claude Code in the `hq` folder. It opens as Jarvis and states the next job: recruit the first role.
-3. **Recruit Tony Stark.** Say: *recruit Tony Stark as the engineer, lab engineering, he builds and runs our app*. Jarvis runs `/recruit`, which makes `labs/engineering/` from the templates (and its private repo if you set `--owner`), adds him to `docs/TEAM.md`, and puts a card on your desk: **Tony Stark's first day**.
+3. **Recruit Tony Stark.** Say: *recruit Tony Stark as the engineer, lab engineering, he builds and runs our app* (or press **Recruit** on the Home tab). Jarvis runs `/recruit`, which makes `labs/engineering/` from the templates (and its private repo if you set `--owner`), adds him to `docs/TEAM.md`, and puts a card on your desk: **Tony Stark's first day**.
 4. **Do the card.** Refresh the dashboard. The card says: open Claude Code in `labs/engineering`, it opens as Tony Stark, say "onboard". Do that; he works through `ONBOARDING.md` with you.
 5. **Answer it.** On the Desk tab tap **Done**, then **Confirm**. The card moves to Answered.
 6. **Watch it get acted on.** The next session in `labs/engineering` is told first thing that you answered its card; it carries on, deletes the card and its reply, and the end hook commits. The card is gone from your desk.
@@ -75,7 +97,8 @@ templates/         a lab's notes, ONBOARDING.md, check-lab.mjs
 desk/              cards/, replies/, pics/, README.md
 board/             cards/, README.md
 docs/TEAM.md       the team, the ideas, the recruiting checklist
-dashboard/         serve.mjs and index.html (Desk, Board, Team)
+dashboard/         serve.mjs, index.html (Home, Desk, Board), theme.css, avatars/
 tools/check.mjs    checks all of HQ
+tools/demo.mjs     an example team and cards, for a first look
 labs/              your labs (each its own repo; ignored by HQ's repo)
 ```

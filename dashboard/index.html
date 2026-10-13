@@ -24,7 +24,7 @@
     <h3>Recruit a role</h3>
     <label for="r-name">Name (who you will talk to)</label><input id="r-name" required placeholder="Tony Stark">
     <label for="r-role">The role, in a few words</label><input id="r-role" required placeholder="the engineer">
-    <label for="r-lab">Lab (its folder: lowercase words and hyphens; a child lab goes under its parent)</label><input id="r-lab" required placeholder="engineering" pattern="[a-z0-9-]+(/[a-z0-9-]+)*">
+    <label for="r-lab">Lab (its folder: lowercase words and hyphens; a child lab goes under its parent)</label><input id="r-lab" required placeholder="engineering" pattern="[a-z0-9\-]+(\/[a-z0-9\-]+)*">
     <label for="r-what">What the lab is, one line</label><input id="r-what" required placeholder="The app: its code, its tests, its deploys">
     <label for="r-does">What the role does, one line (optional)</label><input id="r-does" placeholder="Builds and runs the app">
     <pre id="r-log" hidden></pre>
