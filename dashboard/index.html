@@ -65,6 +65,8 @@ const avatars = () => Object.fromEntries([[home?.hq.role, home?.hq.avatar], ...(
 function face(name, big) {
   const a = avatars()[name];
   if (a) return `<span class="face${big ? ' big' : ''}"><img src="${esc(a)}" alt=""></span>`;
+  // the interface itself wears the reactor, not initials
+  if (name && name === home?.hq.role) return `<span class="face${big ? ' big' : ''}" aria-hidden="true"><svg viewBox="0 0 40 40" width="70%" height="70%"><circle cx="20" cy="20" r="17" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3"/><circle cx="20" cy="20" r="11" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="20" cy="20" r="4.5" fill="currentColor"/></svg></span>`;
   const n = String(name || '?'), init = n.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
   let h = 0; for (const c of n) h = (h * 31 + c.charCodeAt(0)) >>> 0;
   return `<span class="face${big ? ' big' : ''}" style="--c:var(--role-${(h % 6) + 1})" aria-hidden="true">${esc(init)}</span>`;
@@ -100,7 +102,7 @@ function renderHome() {
   const pct = (a, b) => b ? Math.round(100 * a / b) : 0;
   const team = home.labs.map((l) => { const n = l.role || l.holder; return `<article class="panel role">
       <div class="head">${face(n)}<div><h3>${l.role ? esc(l.role) : `<span class="muted">held by ${esc(l.holder)}</span>`}</h3>
-        <div class="title">${esc(l.title || '')}</div></div><span class="chip ${l.state}">${esc(STATE[l.state])}</span></div>
+        <div class="title">${esc(l.title || '')}</div></div></div><span class="chip ${l.state}">${esc(STATE[l.state])}</span>
       ${l.what ? `<p>${esc(l.what)}</p>` : ''}
       ${l.depth > 1 ? `<div class="under">Inside ${esc(l.path.split('/').slice(0, -1).join('/'))}</div>` : ''}
       <div class="next"><b>NEXT</b>${esc(l.next || 'none written')}</div>
