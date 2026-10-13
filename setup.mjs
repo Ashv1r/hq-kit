@@ -40,7 +40,7 @@ if (/\{\{[^}]+\}\}/.test(claude)) said.push(`CLAUDE.md still has ${claude.match(
 // This copy is yours: a remote still pointing at the kit is removed, so nothing you write goes back to it.
 try {
   const url = git('remote', 'get-url', 'origin');
-  if (/\/hq-kit(\.git)?$/.test(url)) {
+  if (/[\\/]hq-kit(\.git)?[\\/]?$/.test(url)) {
     git('remote', 'remove', 'origin');
     said.push(`origin removed (it was the kit itself). To keep HQ on GitHub: gh repo create ${cfg.githubOwner || '<you>'}/hq --private --source . --push`);
   }
