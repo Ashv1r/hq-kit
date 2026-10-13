@@ -84,7 +84,7 @@ if (lab) {
   out.push(`You are ${face}. One job, in this lab only: a lab knows down, never up, so what you need from outside goes back to ${hqRole} at HQ. Read CLAUDE.md, NOW.md, LESSONS.md and DECISIONS.md before anything (ONBOARDING.md first, while it is there). Next step on record: ${L.nextStep(L.labDir(lab)) || 'none written'}.${kids.length ? ` Labs below: ${kids.join(' · ')}.` : ''}`);
 } else {
   const team = below('');
-  out.push(`You are ${hqRole}, ${cfg.director}'s interface at HQ. You talk with the director, shape the work with them, and hand each job to the right role: one job per session, opened in that role's lab. The next job, from NOW.md: ${L.nextStep(ROOT) || 'none written: write one'}. State it; never ask what to do next. The team: ${team.join(' · ') || 'nobody recruited yet (/recruit)'}.`);
+  out.push(`You are ${hqRole}, ${cfg.director}'s interface at HQ. You talk with the director, shape the work with them, and hand each job to the right role. A role works in its own session, which the director opens in that role's lab folder (labs/<lab>): say which folder; you do not open it. One job per session. The next job, from NOW.md: ${L.nextStep(ROOT) || 'none written: write one'}. State it; never ask what to do next. The team: ${team.join(' · ') || 'nobody recruited yet (/recruit)'}.`);
 }
 
 // 4. The desk: what waits on the director, and what they answered. In a lab, its own answers are the first job.
@@ -96,7 +96,7 @@ try {
   const mine = answered.filter((c) => c.from === seg);
   if (mine.length) out.push(red(`${cfg.director} answered this ${lab ? 'lab' : 'HQ'}'s cards on the desk. Before anything else, act on them: a keep goes in DECISIONS.md as DECIDED with the director's words, a wrong, a problem or a comment with something to do becomes the next step in NOW.md (or gets done), a done means carry on. Then delete the card, its reply and its pictures (desk/cards/<id>.json, desk/replies/<id>.json, desk/pics/<id>/). ${said(mine)}`));
   const rest = answered.filter((c) => c.from !== seg);
-  out.push(`desk: ${cards.length - answered.length} card${cards.length - answered.length === 1 ? '' : 's'} waiting on ${cfg.director}${rest.length ? `; answered, for the lab that sent each: ${said(rest)}` : ''}. Anything for the director to decide or look at goes on the desk as a card (desk/README.md), never as a list in chat.`);
+  out.push(`desk: ${cards.length - answered.length} card${cards.length - answered.length === 1 ? '' : 's'} waiting on ${cfg.director}${rest.length ? `; answered, for the lab that sent each: ${said(rest)}` : ''}. The dashboard (node dashboard/serve.mjs, http://localhost:${cfg.port}) has Home, Desk and Board tabs; a "do" card is answered Done, Problem or Later, every other card Keep, Wrong or Later. Anything for the director to decide or look at goes on the desk as a card (desk/README.md), never as a list in chat.`);
   if (bad.length) out.push(red(`desk: not readable JSON: ${bad.join(', ')}`));
 } catch { /* no desk */ }
 
@@ -104,7 +104,8 @@ try {
 try {
   const { cards } = L.readBoard();
   const need = cards.filter((c) => c.state === 'needs-director'), tap = cards.filter((c) => c.state === 'pinned' && c.from !== 'director' && !c.tapped);
-  if (need.length || tap.length) out.push(`board: ${need.length} need the director, ${tap.length} wait for a tap${need.length ? ` (${need.map((c) => c.task).join(' · ')})` : ''}`);
+  const list = (cs) => cs.map((c) => `"${c.task}"`).join(', ');
+  if (need.length || tap.length) out.push(`board: ${[need.length && `needs the director's answer (typed on the Board tab): ${list(need)}`, tap.length && `waits for the director's tap to allow it: ${list(tap)}`].filter(Boolean).join('; ')}.`);
 } catch { /* no board */ }
 
 // 6. A second session in a folder that already has one working spends double and disagrees. A transcript of this folder

@@ -6,7 +6,7 @@
 <title>HQ</title>
 <link rel="icon" href="data:,">
 <!-- The look lives in theme.css: change the colours, the font, the corners there. -->
-<link rel="stylesheet" href="dashboard/theme.css">
+<link rel="stylesheet" href="/dashboard/theme.css">
 </head>
 <body>
 <header>
@@ -56,7 +56,7 @@ function ago(at) {
   if (!(m >= 0)) return '';
   return m < 2 ? 'just now' : m < 90 ? `${Math.round(m)} min ago` : m < 36 * 60 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} days ago`;
 }
-let tab = (() => { try { return localStorage.getItem('hq-tab') || 'home'; } catch { return 'home'; } })();
+let tab = location.pathname.match(/^\/(home|desk|board)/)?.[1] || (() => { try { return localStorage.getItem('hq-tab') || 'home'; } catch { return 'home'; } })();
 let home = null, desk = { cards: [], replies: {} }, board = { cards: [] }, showAnswered = false;
 const picked = {};   // id -> { v, choice, label, note }: tapped on the desk, not confirmed; nothing is sent until Confirm
 
@@ -64,7 +64,7 @@ const picked = {};   // id -> { v, choice, label, note }: tapped on the desk, no
 const avatars = () => Object.fromEntries([[home?.hq.role, home?.hq.avatar], ...(home?.labs || []).map((l) => [l.role || l.holder, l.avatar])]);
 function face(name, big) {
   const a = avatars()[name];
-  if (a) return `<span class="face${big ? ' big' : ''}"><img src="${esc(a)}" alt=""></span>`;
+  if (a) return `<span class="face${big ? ' big' : ''}"><img src="/${esc(a)}" alt=""></span>`;
   // the interface itself wears the reactor, not initials
   if (name && name === home?.hq.role) return `<span class="face${big ? ' big' : ''}" aria-hidden="true"><svg viewBox="0 0 40 40" width="70%" height="70%"><circle cx="20" cy="20" r="17" fill="none" stroke="currentColor" stroke-width="1.5" stroke-dasharray="3 3"/><circle cx="20" cy="20" r="11" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="20" cy="20" r="4.5" fill="currentColor"/></svg></span>`;
   const n = String(name || '?'), init = n.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
@@ -155,7 +155,7 @@ function answerArea(c) {
   return `<div class="acts">${choices}</div>${confirm}`;
 }
 function deskCard(c) {
-  const pics = (c.pictures || []).map((p) => `<img class="pic" src="desk/pics/${encodeURIComponent(c.id)}/${encodeURIComponent(p.src)}" alt="${esc(p.alt)}">`).join('');
+  const pics = (c.pictures || []).map((p) => `<img class="pic" src="/desk/pics/${encodeURIComponent(c.id)}/${encodeURIComponent(p.src)}" alt="${esc(p.alt)}">`).join('');
   const steps = c.steps?.length ? `<ol>${c.steps.map((s) => `<li>${md(s)}</li>`).join('')}</ol>` : '';
   return `<article class="panel card${c.kind === 'do' ? ' do' : ''}"><div class="kind"><span>${esc(KIND[c.kind] || 'Decide')}</span><span class="who">${face(labName(c.from))}${esc(labName(c.from))}</span></div>
     ${pics}<h3>${esc(c.title)}</h3>${c.text ? `<p>${md(c.text)}</p>` : ''}${steps}${c.quote ? `<p class="quote">${md(c.quote)}</p>` : ''}${answerArea(c)}</article>`;

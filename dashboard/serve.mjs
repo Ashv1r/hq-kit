@@ -139,7 +139,8 @@ http.createServer(async (req, res) => {
     if (url.pathname === '/api/home') return json(200, home());
     if (url.pathname === '/api/recruit' && req.method === 'POST') { const r = await recruit(await body(req)); return json(r.ok ? 200 : 500, r); }
     if (url.pathname === '/api/pin' && req.method === 'POST') return json(200, { ok: true, id: await pin(await body(req)) });
-    let rel = url.pathname === '/' ? 'dashboard/index.html' : decodeURIComponent(url.pathname.slice(1));
+    // the page answers at / and at /home, /desk and /board, each opening on that tab
+    let rel = /^\/(home|desk|board)?\/?$/.test(url.pathname) ? 'dashboard/index.html' : decodeURIComponent(url.pathname.slice(1));
     if (rel.includes('..') || !(/^dashboard\/(index\.html|theme\.css|fonts\/[\w.-]+\.(css|woff2)|avatars\/[a-z0-9-]+\.(png|jpg|webp|svg))$/.test(rel) || /^desk\/pics\/[a-z0-9-]+\/[\w.-]+$/.test(rel))) { res.writeHead(404); return res.end(); }
     const data = await readFile(path.join(ROOT, rel));
     res.writeHead(200, { 'content-type': TYPES[path.extname(rel).toLowerCase()] || 'application/octet-stream', 'cache-control': 'no-cache' });
