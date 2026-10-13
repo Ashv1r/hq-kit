@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HQ</title>
+<link rel="icon" href="data:,">
+<style>
+:root { --bg: #f6f6f4; --card: #fff; --ink: #1d1d1f; --muted: #6b6b70; --line: #e2e2e0; --accent: #2563eb; --keep: #15803d; --wrong: #b91c1c; --later: #6b6b70; --task: #fef3c7; --task-ink: #78350f; }
+@media (prefers-color-scheme: dark) { :root { --bg: #141416; --card: #1e1e21; --ink: #ececee; --muted: #9a9aa2; --line: #2e2e33; --accent: #60a5fa; --keep: #4ade80; --wrong: #f87171; --later: #9a9aa2; --task: #3a2f12; --task-ink: #fcd34d; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+header { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); padding: 12px 16px 0; }
+header h1 { margin: 0 0 8px; font-size: 18px; }
+header h1 small { color: var(--muted); font-weight: 400; }
+nav { display: flex; gap: 4px; }
+nav button { border: 0; background: none; color: var(--muted); font: inherit; padding: 8px 12px; border-bottom: 2px solid transparent; cursor: pointer; }
+nav button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
+nav .n { display: inline-block; min-width: 20px; margin-left: 4px; padding: 0 6px; border-radius: 10px; background: var(--line); font-size: 12px; text-align: center; }
+main { max-width: 1100px; margin: 0 auto; padding: 16px; }
+.bar { display: flex; gap: 8px; margin-bottom: 12px; }
+.bar button { font: inherit; font-size: 14px; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--card); color: var(--muted); cursor: pointer; }
+.bar button[aria-pressed="true"] { color: var(--ink); border-color: var(--accent); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.card.do { border-top: 4px solid var(--task-ink); }
+.kind { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+.card h3 { margin: 0; font-size: 17px; }
+.card p { margin: 0; }
+.card img { max-width: 100%; border-radius: 6px; border: 1px solid var(--line); }
+.quote { color: var(--muted); font-style: italic; }
+ol { margin: 0; padding-left: 22px; }
+.card.do ol { background: var(--task); color: var(--task-ink); border-radius: 6px; padding: 8px 8px 8px 30px; }
+code { font: 13px ui-monospace, Consolas, monospace; background: var(--line); padding: 1px 4px; border-radius: 4px; }
+.card.do code { background: transparent; }
+.acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+.acts button, .go, .cancel { font: inherit; font-size: 15px; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; min-height: 40px; }
+.acts .keep { color: var(--keep); } .acts .wrong { color: var(--wrong); } .acts .later { color: var(--later); }
+.acts button.on { border-color: currentColor; box-shadow: inset 0 0 0 1px currentColor; }
+.acts .opt { text-align: left; flex: 1 1 100%; }
+.acts .opt small { display: block; color: var(--muted); font-size: 13px; }
+.rec { font-size: 11px; color: var(--accent); margin-left: 6px; }
+textarea { width: 100%; font: inherit; padding: 8px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.cbar { display: flex; gap: 6px; margin-top: 6px; }
+.go { background: var(--accent); border-color: var(--accent); color: #fff; }
+.stamp { font-weight: 600; } .stamp.keep { color: var(--keep); } .stamp.wrong { color: var(--wrong); } .stamp.later { color: var(--later); }
+.answered { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; margin-top: auto; }
+.answered .note { color: var(--ink); }
+.answered .age { flex-basis: 100%; font-size: 13px; color: var(--muted); }
+.answered .age.stale { color: var(--wrong); }
+.answered button { font: inherit; font-size: 13px; background: none; border: 0; color: var(--accent); cursor: pointer; padding: 0; }
+.talk { font-size: 13px; color: var(--accent); }
+.empty { color: var(--muted); padding: 32px 0; text-align: center; }
+.empty b { display: block; color: var(--ink); margin-bottom: 4px; }
+.cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+@media (max-width: 800px) { .cols { grid-template-columns: 1fr; } }
+.col h2 { font-size: 14px; color: var(--muted); margin: 0 0 8px; text-transform: uppercase; letter-spacing: .04em; }
+.col .card { margin-bottom: 8px; }
+.meta { font-size: 13px; color: var(--muted); }
+.result { font-size: 14px; }
+.tap { font: inherit; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--accent); background: var(--card); color: var(--accent); cursor: pointer; }
+.tree { background: var(--card); border: 1px solid var(--line); border-radius: 10px; }
+.lab { padding: 10px 14px; border-top: 1px solid var(--line); }
+.lab:first-child { border-top: 0; }
+.lab .who { font-weight: 600; }
+.lab .path { font: 13px ui-monospace, Consolas, monospace; color: var(--muted); }
+.lab .what, .lab .next { font-size: 14px; }
+.lab .next { color: var(--muted); }
+.held { color: var(--muted); font-weight: 400; }
+#toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 8px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+#toast.on { opacity: 1; }
+</style>
+</head>
+<body>
+<header>
+  <h1>HQ <small id="who"></small></h1>
+  <nav role="tablist">
+    <button role="tab" data-tab="desk" aria-selected="true">Desk<span class="n" id="n-desk">0</span></button>
+    <button role="tab" data-tab="board" aria-selected="false">Board<span class="n" id="n-board">0</span></button>
+    <button role="tab" data-tab="team" aria-selected="false">Team</button>
+  </nav>
+</header>
+<main id="main"></main>
+<div id="toast" role="status"></div>
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const md = (s) => esc(s).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
+function toast(m) { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 1800); }
+function ago(at) {
+  const m = (Date.now() - Date.parse(at)) / 60000;
+  if (!(m >= 0)) return '';
+  return m < 2 ? 'just now' : m < 90 ? `${Math.round(m)} min ago` : m < 36 * 60 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} days ago`;
+}
+let tab = (() => { try { return localStorage.getItem('hq-tab') || 'desk'; } catch { return 'desk'; } })();
+let desk = { cards: [], replies: {} }, board = { cards: [] }, team = null, showAnswered = false;
+const picked = {};   // id -> { v, choice, label, note }: tapped, not confirmed; nothing is sent until Confirm
+
+// ---- the desk
+const waiting = (c) => !desk.replies[c.id] || desk.replies[c.id].v === 'later';
+const KIND = { look: 'Look, then decide', try: 'Try it, then decide', choose: 'Pick one', design: 'How it should work', rule: 'Agree or not', do: 'Your task: do these' };
+const CHOICES = (c) => c.kind === 'do' ? [['done', 'keep', 'Done'], ['problem', 'wrong', 'Problem'], ['later', 'later', 'Later']]
+  : c.kind === 'rule' ? [['keep', 'keep', 'Keep'], ['wrong', 'wrong', 'Wrong']] : [['keep', 'keep', 'Keep'], ['wrong', 'wrong', 'Wrong'], ['later', 'later', 'Later']];
+const WORD = { keep: 'Kept', wrong: 'Wrong', later: 'Later', done: 'Done', problem: 'Problem' };
+const NEEDS_NOTE = { wrong: "What's wrong? Say what, not how wrong.", problem: 'What happened? Say where it stopped.' };
+const pic = (id, src) => `desk/pics/${encodeURIComponent(id)}/${encodeURIComponent(src)}`;
+function answerArea(c) {
+  const p = picked[c.id], r = desk.replies[c.id];
+  if (r && !p) {
+    const cls = { keep: 'keep', done: 'keep', wrong: 'wrong', problem: 'wrong' }[r.v] || 'later';
+    const stale = r.v !== 'later' && Date.now() - Date.parse(r.at) > 864e5;
+    return `<div class="answered"><span class="stamp ${cls}">${esc(r.label || WORD[r.v])}</span>${r.note ? `<span class="note">${esc(r.note)}</span>` : ''}<button data-change="${esc(c.id)}">Change</button>
+      ${r.v !== 'later' ? `<span class="age${stale ? ' stale' : ''}">Answered ${esc(ago(r.at))}. ${stale ? 'Not picked up yet: the lab clears it when it acts.' : 'Clears when the lab acts on it.'}</span>` : ''}</div>`;
+  }
+  const choices = c.kind === 'choose' && c.options?.length
+    ? c.options.map((o) => `<button class="opt${p?.choice === o.k ? ' on' : ''}" data-pick="${esc(c.id)}" data-v="keep" data-k="${esc(o.k)}" data-t="${esc(o.t)}">${esc(o.t)}${o.rec ? '<span class="rec">suggested</span>' : ''}${o.s ? `<small>${esc(o.s)}</small>` : ''}</button>`).join('')
+      + `<button class="later${p?.v === 'later' ? ' on' : ''}" data-pick="${esc(c.id)}" data-v="later">Later</button>`
+    : CHOICES(c).map(([v, cls, t]) => `<button class="${cls}${p?.v === v && !p?.choice ? ' on' : ''}" data-pick="${esc(c.id)}" data-v="${v}">${t}</button>`).join('');
+  const confirm = p ? `<div><textarea id="note-${esc(c.id)}" rows="2" placeholder="${NEEDS_NOTE[p.v] || 'Add a comment (optional)'}" aria-label="Comment">${esc(p.note || '')}</textarea>
+    <div class="cbar"><button class="go" data-confirm="${esc(c.id)}">Confirm: ${esc(p.label || { keep: 'Keep', wrong: 'Wrong', later: 'Later', done: 'Done', problem: 'Problem' }[p.v])}</button><button class="cancel" data-cancel="${esc(c.id)}">Cancel</button></div></div>` : '';
+  return `<div class="acts">${choices}</div>${confirm}`;
+}
+function deskCard(c) {
+  const pics = (c.pictures || []).map((p) => `<img src="${pic(c.id, p.src)}" alt="${esc(p.alt)}">`).join('');
+  const steps = c.steps?.length ? `<ol>${c.steps.map((s) => `<li>${md(s)}</li>`).join('')}</ol>` : '';
+  const talk = /^claude:\/\//.test(c.session || '') ? `<a class="talk" href="${esc(c.session)}">Talk to the session that sent this</a>` : '';
+  return `<article class="card${c.kind === 'do' ? ' do' : ''}"><div class="kind"><span>${esc(KIND[c.kind] || 'Decide')}</span><span>${esc(c.from)}</span></div>
+    ${pics}<h3>${esc(c.title)}</h3>${c.text ? `<p>${md(c.text)}</p>` : ''}${steps}${c.quote ? `<p class="quote">${md(c.quote)}</p>` : ''}${answerArea(c)}${talk}</article>`;
+}
+function renderDesk() {
+  const shown = desk.cards.filter((c) => picked[c.id] || (showAnswered ? !waiting(c) : waiting(c)));
+  const w = desk.cards.filter(waiting).length;
+  return `<div class="bar"><button data-view="waiting" aria-pressed="${!showAnswered}">Waiting (${w})</button><button data-view="answered" aria-pressed="${showAnswered}">Answered (${desk.cards.length - w})</button></div>`
+    + (shown.length ? `<div class="grid">${shown.map(deskCard).join('')}</div>`
+      : showAnswered ? '<div class="empty"><b>Nothing answered is waiting to clear</b>An answered card stays here until the lab that sent it acts on it.</div>'
+        : '<div class="empty"><b>Nothing on your desk</b>When a session needs you to decide something, its card lands here.</div>');
+}
+
+// ---- the board
+const COLS = [['needs-director', 'Needs you'], ['pinned', 'Pinned'], ['taken', 'Taken'], ['done', 'Done']];
+const waitsTap = (c) => c.state === 'pinned' && c.from !== 'director' && !c.tapped;
+function boardCard(c) {
+  let body = '';
+  if (waitsTap(c)) body = `<button class="tap" data-tap="${esc(c.id)}">Tap</button><span class="meta">${esc(c.from)} pinned this. Nothing runs until you tap.</span>`;
+  else if (c.state === 'pinned') body = `<span class="meta">${c.from === 'director' ? 'From you, so no tap needed.' : `Tapped ${esc(ago(c.tapped))}.`} Waiting to be taken.</span>`;
+  else if (c.result) body = `<p class="result">${md(c.result)}</p>`;
+  return `<article class="card"><div class="kind"><span>${esc(c.role || '')}</span><span>${esc(c.lab || '')}</span></div><h3>${esc(c.task)}</h3>${body}<span class="meta">pinned ${esc(ago(c.at))} by ${esc(c.from === 'director' ? 'you' : c.from)}</span></article>`;
+}
+function renderBoard() {
+  if (!board.cards.length) return '<div class="empty"><b>Nothing pinned</b>Give Jarvis a job and its card goes up here.</div>';
+  return `<div class="cols">${COLS.map(([s, t]) => { const cs = board.cards.filter((c) => c.state === s); return `<section class="col"><h2>${t} (${cs.length})</h2>${cs.map(boardCard).join('')}</section>`; }).join('')}</div>`;
+}
+
+// ---- the team
+function renderTeam() {
+  if (!team) return '';
+  const rows = [`<div class="lab"><div class="who">${esc(team.hq.role)} <span class="path">HQ</span></div><div class="what">The director's interface.</div><div class="next">Next: ${esc(team.hq.next || 'none written')}</div></div>`]
+    .concat(team.labs.map((l) => `<div class="lab" style="padding-left:${14 + l.depth * 22}px">
+      <div class="who">${l.role ? esc(l.role) : `<span class="held">held by ${esc(l.holder)}</span>`} <span class="path">labs/${esc(l.path)}</span></div>
+      ${l.what ? `<div class="what">${esc(l.what)}</div>` : ''}<div class="next">${l.here ? `Next: ${esc(l.next || 'none written')}` : 'Not on this machine yet: the next session start clones it.'}</div></div>`));
+  return `<div class="tree">${rows.join('')}</div>${team.labs.length ? '' : '<div class="empty"><b>Nobody recruited yet</b>Ask Jarvis to recruit the first role (/recruit).</div>'}`;
+}
+
+function render() {
+  const focus = document.activeElement?.id, caret = document.activeElement?.selectionStart;
+  document.querySelectorAll('nav button').forEach((b) => b.setAttribute('aria-selected', b.dataset.tab === tab));
+  $('#main').innerHTML = tab === 'desk' ? renderDesk() : tab === 'board' ? renderBoard() : renderTeam();
+  $('#n-desk').textContent = desk.cards.filter(waiting).length;
+  $('#n-board').textContent = board.cards.filter((c) => c.state === 'needs-director' || waitsTap(c)).length;
+  const f = focus && document.getElementById(focus);
+  if (f) { f.focus(); if (caret != null && f.setSelectionRange) f.setSelectionRange(caret, caret); }
+}
+async function load() {
+  try {
+    const [d, b, t] = await Promise.all(['/api/desk', '/api/board', '/api/team'].map((u) => fetch(u, { cache: 'no-store' }).then((r) => r.json())));
+    desk = d; board = b; team = t;
+    $('#who').textContent = d.director && d.director !== 'the director' ? `· ${d.director}` : '';
+    render();
+  } catch { $('#main').innerHTML = '<div class="empty"><b>HQ could not be read</b>Is the dashboard server running? node dashboard/serve.mjs</div>'; }
+}
+async function post(url, data) {
+  const r = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data) });
+  const o = await r.json(); if (!r.ok) throw new Error(o.error || 'not sent'); return o;
+}
+const noteOf = (id) => document.getElementById('note-' + id)?.value.trim() || '';
+document.addEventListener('click', async (e) => {
+  const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.tab) { tab = b.dataset.tab; try { localStorage.setItem('hq-tab', tab); } catch {} return render(); }
+  if (b.dataset.view) { showAnswered = b.dataset.view === 'answered'; return render(); }
+  if (b.dataset.pick) { const id = b.dataset.pick; picked[id] = { v: b.dataset.v, choice: b.dataset.k, label: b.dataset.t, note: noteOf(id) }; render(); return document.getElementById('note-' + id)?.focus(); }
+  if (b.dataset.cancel) { delete picked[b.dataset.cancel]; return render(); }
+  if (b.dataset.change) { const id = b.dataset.change, r = desk.replies[id]; picked[id] = { v: r.v, choice: r.choice, label: r.choice ? r.label : undefined, note: r.note }; return render(); }
+  if (b.dataset.confirm) {
+    const id = b.dataset.confirm, p = picked[id], note = noteOf(id);
+    if (NEEDS_NOTE[p.v] && !note) { toast(p.v === 'problem' ? 'Say what happened first' : "Say what's wrong first"); return document.getElementById('note-' + id).focus(); }
+    const rec = { v: p.v, choice: p.choice, label: p.label, note: note || undefined };
+    try { await post('/api/desk', { id, ...rec }); desk.replies[id] = { ...rec, at: new Date().toISOString() }; delete picked[id]; render(); toast(p.v === 'later' ? 'Sent: kept on your desk' : 'Sent: moved to Answered'); }
+    catch (err) { toast('Not sent: ' + err.message); }
+  }
+  if (b.dataset.tap) {
+    b.disabled = true;
+    try { const o = await post('/api/board', { id: b.dataset.tap }); board.cards.find((c) => c.id === b.dataset.tap).tapped = o.tapped; render(); toast('Tapped: it gets taken next'); }
+    catch (err) { b.disabled = false; toast('Not tapped: ' + err.message); }
+  }
+});
+document.addEventListener('input', (e) => { const m = e.target.id?.match(/^note-(.+)$/); if (m && picked[m[1]]) picked[m[1]].note = e.target.value; });
+load(); setInterval(() => { if (!Object.keys(picked).length && !document.activeElement?.matches('textarea')) load(); }, 30000);
+</script>
+</body>
+</html>

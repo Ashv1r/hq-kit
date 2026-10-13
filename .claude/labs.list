@@ -1,0 +1,2 @@
+# The labs, one path under labs/ per line, a child lab under its parent (engineering/suits).
+# Each is its own private repo, <githubOwner>/<repoPrefix><last segment> (hq.json). The start hook clones and pulls them.

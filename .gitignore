@@ -1,0 +1,4 @@
+# HQ tracks only itself. Every lab is its own repo.
+/labs/
+node_modules/
+*.log

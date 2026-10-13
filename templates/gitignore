@@ -1,0 +1,4 @@
+# A child lab that is its own repo gets one line here, /<name>/, so this repo never swallows it.
+node_modules/
+*.log
+.env
