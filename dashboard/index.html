@@ -144,7 +144,9 @@ function boardCard(c) {
   let body = '';
   if (waitsTap(c)) body = `<div><button class="btn small primary" data-tap="${esc(c.id)}">Tap to allow</button></div><span class="meta">${esc(c.from)} pinned this for itself. Nothing runs until you tap.</span>`;
   else if (c.state === 'pinned') body = `<span class="meta">${c.from === 'director' ? 'From you, so no tap needed.' : `Tapped ${esc(ago(c.tapped))}.`} Waiting to be taken.</span>`;
+  else if (c.state === 'needs-director') body = `<p>${md(c.result || 'Waiting on you.')}</p><textarea id="ans-${esc(c.id)}" rows="2" placeholder="Your answer" aria-label="Your answer"></textarea><div><button class="btn small primary" data-answer="${esc(c.id)}">Send answer</button></div>`;
   else if (c.result) body = `<p class="meta" style="color:var(--ink)">${md(c.result)}</p>`;
+  if (c.answer && c.state !== 'needs-director') body += `<span class="meta">You answered: ${esc(c.answer)}</span>`;
   return `<article class="panel"><div class="who">${face(c.role)}${esc(c.role || '')} · ${esc(c.lab || '')}</div><h4>${esc(c.task)}</h4>${body}<span class="meta">pinned ${esc(ago(c.at))} by ${esc(c.from === 'director' ? 'you' : c.from)}</span></article>`;
 }
 function renderBoard() {
@@ -198,6 +200,13 @@ document.addEventListener('click', async (e) => {
     const rec = { v: p.v, choice: p.choice, label: p.label, note: note || undefined };
     try { await post('/api/desk', { id, ...rec }); desk.replies[id] = { ...rec, at: new Date().toISOString() }; delete picked[id]; render(); toast(p.v === 'later' ? 'Sent: kept on your desk' : 'Sent: moved to Answered'); }
     catch (err) { toast('Not sent: ' + err.message); }
+  }
+  if (b.dataset.answer) {
+    const id = b.dataset.answer, text = document.getElementById('ans-' + id).value.trim();
+    if (!text) { toast('Say the answer first'); return document.getElementById('ans-' + id).focus(); }
+    try { await post('/api/board', { id, answer: text }); toast('Sent: the job is pinned again with your answer'); await load(); }
+    catch (err) { toast('Not sent: ' + err.message); }
+    return;
   }
   if (b.dataset.tap) {
     b.disabled = true;

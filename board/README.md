@@ -27,6 +27,7 @@ The one list of work: one card per task, in `board/cards/<id>.json`. The dashboa
 | `at` | When it was pinned, ISO time |
 | `tapped` | When the director tapped it (the dashboard writes it) |
 | `result` | One line from whoever worked it |
+| `answer`, `question` | The director's answer to a `needs-director` card, typed on the Board tab. The card goes back to `pinned` with the answer on it, and the question kept |
 
 ## The rules
 

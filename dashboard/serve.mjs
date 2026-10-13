@@ -49,10 +49,19 @@ async function answer({ id, v, note, choice, label }) {
   save(rel, `Desk: ${v}${label ? ` (${clean(label, 40)})` : ''} on ${card.title || id}`);
 }
 
-async function tap({ id }) {
+async function tap({ id, answer }) {
   if (!ID.test(String(id))) throw fail(404, 'no such card');
   const rel = `board/cards/${id}.json`, file = path.join(ROOT, rel);
   const card = JSON.parse(await readFile(file, 'utf8'));
+  // the director answers a card that needs them: the answer goes on the card and it is pinned again, ready to be taken
+  if (answer != null) {
+    if (card.state !== 'needs-director') throw fail(400, 'only a card that needs you takes an answer');
+    if (!clean(answer, 1000)) throw fail(400, 'say the answer first');
+    Object.assign(card, { answer: clean(answer, 1000), question: card.result, result: undefined, state: 'pinned', tapped: new Date().toISOString() });
+    await writeFile(file, JSON.stringify(card, null, 1) + '\n');
+    save(rel, `Board: answered ${card.task || id}`);
+    return card.tapped;
+  }
   if (card.from === 'director') throw fail(400, 'a card from the director needs no tap');
   if (card.state !== 'pinned') throw fail(400, 'only a pinned card takes a tap');
   if (!card.tapped) {

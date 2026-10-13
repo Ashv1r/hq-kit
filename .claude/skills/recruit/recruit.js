@@ -192,6 +192,18 @@ step(6, `desk card ${cardId}`, () => {
   return 'written';
 });
 
+// 6b. HQ's NOW.md still asking for the first recruit moves on to the onboarding.
+step('6b', "HQ's next step", () => {
+  const f = path.join(ROOT, 'NOW.md'), text = L.read(f);
+  if (!/## Next step\s*\n+Recruit the first role/.test(text)) return 'not the first recruit, left as it is';
+  fs.writeFileSync(f, text
+    .replace(/(## Next step\s*\n+)Recruit the first role[^\n]*/, `$1${name.trim()}'s first day: the card on the desk.`)
+    .replace(/(## Status\s*\n+)[^\n]*/, `$1${name.trim()} recruited ${today} as ${role.trim()}.`)
+    .replace(/(## Open questions for the director\s*\n+)- Who is the first role[^\n]*/, '$1- none'));
+  hqPaths.push('NOW.md');
+  return 'moved on to the onboarding';
+});
+
 // 7. HQ committed (and pushed, when it has a remote): the list line, the team row, the card.
 step(7, 'HQ committed', () => {
   const did = commit(ROOT, `Recruit ${name.trim()} (${role.trim()}) into labs/${rel}`, hqPaths);
