@@ -15,7 +15,7 @@ const ROOT = L.ROOT;
 const cfg = L.config();
 const HOST = process.env.HOST || '127.0.0.1';
 const ID = /^[a-z0-9][a-z0-9-]{0,60}$/;
-const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp', '.svg': 'image/svg+xml' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.woff2': 'font/woff2', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.gif': 'image/gif', '.webp': 'image/webp', '.svg': 'image/svg+xml' };
 
 const git = (...args) => new Promise((resolve) => execFile('git', args, { cwd: ROOT, windowsHide: true, timeout: 60000 },
   (err, out, errOut) => resolve({ ok: !err, out: String(out).trim(), err: String(errOut || err?.message || '').trim() })));
@@ -140,7 +140,7 @@ http.createServer(async (req, res) => {
     if (url.pathname === '/api/recruit' && req.method === 'POST') { const r = await recruit(await body(req)); return json(r.ok ? 200 : 500, r); }
     if (url.pathname === '/api/pin' && req.method === 'POST') return json(200, { ok: true, id: await pin(await body(req)) });
     let rel = url.pathname === '/' ? 'dashboard/index.html' : decodeURIComponent(url.pathname.slice(1));
-    if (rel.includes('..') || !(/^dashboard\/(index\.html|theme\.css)$/.test(rel) || /^desk\/pics\/[a-z0-9-]+\/[\w.-]+$/.test(rel))) { res.writeHead(404); return res.end(); }
+    if (rel.includes('..') || !(/^dashboard\/(index\.html|theme\.css|fonts\/[\w.-]+\.(css|woff2)|avatars\/[a-z0-9-]+\.(png|jpg|webp|svg))$/.test(rel) || /^desk\/pics\/[a-z0-9-]+\/[\w.-]+$/.test(rel))) { res.writeHead(404); return res.end(); }
     const data = await readFile(path.join(ROOT, rel));
     res.writeHead(200, { 'content-type': TYPES[path.extname(rel).toLowerCase()] || 'application/octet-stream', 'cache-control': 'no-cache' });
     return res.end(data);

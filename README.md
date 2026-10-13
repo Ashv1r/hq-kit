@@ -52,7 +52,8 @@ Open http://localhost:4800. **Home** shows Jarvis, the team and what needs you; 
 
 ## Make it look like yours
 
-- **Colours, font, corners:** `dashboard/theme.css`, the block at the top.
+- **Colours, glow, corners:** `dashboard/theme.css`, the block at the top. It is styled as Jarvis's heads-up display; every colour is one line there.
+- **Typefaces:** `dashboard/fonts/` (Orbitron and Chakra Petch, self-hosted, open licence); swap the files and the two `--font` lines.
 - **The name in the header:** `"name"` in `hq.json` (or `node setup.mjs --name "Stark Tower"`).
 - **A role's picture:** a square image at `dashboard/avatars/<name>.png` (`tony-stark.png`). Without one, the page shows initials.
 - **The page itself:** `dashboard/index.html`, plain HTML and JavaScript, no build step.
