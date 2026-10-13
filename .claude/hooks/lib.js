@@ -12,6 +12,7 @@ function config(root = ROOT) {
   let c = {};
   try { c = JSON.parse(fs.readFileSync(path.join(root, 'hq.json'), 'utf8')); } catch { /* not set up yet */ }
   return {
+    name: (c.name || '').trim() || 'HQ',
     director: (c.director || '').trim() || 'the director',
     githubOwner: (process.env.GITHUB_OWNER || c.githubOwner || '').trim(),
     repoPrefix: c.repoPrefix == null ? 'lab-' : c.repoPrefix,
@@ -37,6 +38,11 @@ function roleOf(dir) {
   const m = read(path.join(dir, 'CLAUDE.md')).match(/^## Role[ \t]*\r?\n+[ \t]*([^\n,.]+)/m);
   const name = m ? m[1].trim() : '';
   return /^(none|nobody|-|<.*>)$/i.test(name) ? '' : name;
+}
+// What the role is: the Role line after the name, up to its first full stop ("the engineer").
+function roleTitle(dir) {
+  const m = read(path.join(dir, 'CLAUDE.md')).match(/^## Role[ \t]*\r?\n+[ \t]*[^\n,]+,\s*([^\n.]+)/m);
+  return m ? m[1].trim() : '';
 }
 const section = (file, head) => { const m = read(file).match(new RegExp(`^## ${head}[ \\t]*\\r?\\n+([^\\n]+)`, 'm')); return m ? m[1].trim().replace(/\.$/, '') : ''; };
 const whatOf = (dir) => section(path.join(dir, 'CLAUDE.md'), 'What this is');
@@ -80,4 +86,4 @@ function readBoard(root = ROOT) {
 const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
 const red = (s) => `\x1b[31m${s}\x1b[0m`;
 
-module.exports = { ROOT, LAB_PATH, config, labs, labDir, repoOf, read, roleOf, whatOf, nextStep, git, hookInput, labAt, standAside, readDesk, readBoard, today, red };
+module.exports = { ROOT, LAB_PATH, config, labs, labDir, repoOf, read, roleOf, roleTitle, whatOf, nextStep, git, hookInput, labAt, standAside, readDesk, readBoard, today, red };

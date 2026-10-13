@@ -1,0 +1,134 @@
+/* The look of the dashboard. Change anything here; index.html holds only the structure and the code.
+   Quick changes: the colours just below, the font, the corner radius. The name in the header is "name" in hq.json.
+   A role's picture: put a square image at dashboard/avatars/<name>.png (tony-stark.png); without one it shows initials. */
+
+:root {
+  --bg: #f5f6f8;            /* the page */
+  --panel: #ffffff;         /* cards */
+  --ink: #16181d;           /* text */
+  --muted: #677084;         /* quieter text */
+  --line: #e3e6ec;          /* borders */
+  --accent: #c8102e;        /* buttons, links, the selected tab */
+  --accent-ink: #ffffff;    /* text on the accent */
+  --good: #12805c;          /* keep, done, ready */
+  --bad: #c42b2b;           /* wrong, problem */
+  --warn: #b7791f;          /* waiting on you */
+  --task: #fff6e0;          /* the band on a task card */
+  --radius: 12px;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* initials circles, picked per name */
+  --role-1: #c8102e; --role-2: #1f5fbf; --role-3: #12805c; --role-4: #7a3fb8; --role-5: #b7791f; --role-6: #0e7490;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1115; --panel: #181b21; --ink: #e9ebf0; --muted: #949bab; --line: #282c35;
+    --accent: #ff4d5e; --accent-ink: #14060a; --good: #3ccf91; --bad: #ff6b6b; --warn: #f0b44c; --task: #2b2410;
+  }
+}
+
+/* ---- the frame */
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.45 var(--font); }
+header { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
+.top { max-width: 1100px; margin: 0 auto; padding: 14px 16px 0; display: flex; align-items: baseline; gap: 10px; }
+.top h1 { margin: 0; font-size: 20px; letter-spacing: .02em; }
+.top .sub { color: var(--muted); font-size: 14px; }
+nav { max-width: 1100px; margin: 0 auto; padding: 0 16px; display: flex; gap: 4px; }
+nav button { border: 0; background: none; color: var(--muted); font: inherit; padding: 10px 12px; border-bottom: 2px solid transparent; cursor: pointer; }
+nav button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 600; }
+.n { display: inline-block; min-width: 20px; margin-left: 6px; padding: 0 6px; border-radius: 10px; background: var(--line); font-size: 12px; text-align: center; }
+.n.hot { background: var(--accent); color: var(--accent-ink); }
+main { max-width: 1100px; margin: 0 auto; padding: 18px 16px 48px; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 26px 0 10px; display: flex; align-items: center; gap: 10px; }
+h2:first-child { margin-top: 4px; }
+h2 .grow { flex: 1; }
+
+/* ---- shared pieces */
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; min-width: 0; }
+.btn { font: inherit; font-size: 15px; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; min-height: 40px; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.small { font-size: 13px; min-height: 0; padding: 5px 10px; }
+.btn.keep { color: var(--good); } .btn.wrong { color: var(--bad); } .btn.later { color: var(--muted); }
+.btn.on { border-color: currentColor; box-shadow: inset 0 0 0 1px currentColor; }
+.muted { color: var(--muted); }
+code, .path { font: 13px ui-monospace, Consolas, monospace; }
+code { background: var(--line); padding: 1px 5px; border-radius: 4px; }
+.empty { color: var(--muted); padding: 28px 0; text-align: center; }
+.empty b { display: block; color: var(--ink); margin-bottom: 4px; }
+
+/* a face: a picture, or initials in a coloured circle */
+.face { width: 44px; height: 44px; border-radius: 50%; flex: none; display: grid; place-items: center; font-weight: 700; color: #fff; overflow: hidden; }
+.face img { width: 100%; height: 100%; object-fit: cover; }
+.face.big { width: 56px; height: 56px; font-size: 20px; }
+
+/* a state chip on a role */
+.chip { font-size: 12px; padding: 2px 8px; border-radius: 10px; border: 1px solid currentColor; white-space: nowrap; }
+.chip.ready { color: var(--good); } .chip.onboarding { color: var(--muted); } .chip.working { color: var(--accent); } .chip.waiting { color: var(--warn); } .chip.away { color: var(--muted); }
+
+/* ---- home */
+.hero { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; }
+@media (max-width: 760px) { .hero { grid-template-columns: 1fr 1fr; } .hero .jarvis { grid-column: 1 / -1; } }
+.jarvis { display: flex; gap: 14px; align-items: flex-start; }
+.jarvis h3, .role h3 { margin: 0; font-size: 17px; }
+.jarvis p, .role p { margin: 4px 0 0; }
+.stat { cursor: pointer; text-align: left; font: inherit; color: inherit; }
+.stat .big { font-size: 34px; font-weight: 700; line-height: 1.1; }
+.stat .big.hot { color: var(--warn); }
+.open { display: flex; gap: 6px; align-items: center; margin-top: 10px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.team { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.role { display: flex; flex-direction: column; gap: 8px; }
+.role .head { display: flex; gap: 12px; align-items: center; }
+.role .head > div { min-width: 0; flex: 1; }
+.role .title { color: var(--muted); font-size: 14px; }
+.role .next { font-size: 14px; border-top: 1px solid var(--line); padding-top: 8px; }
+.role .under { font-size: 13px; color: var(--muted); }
+.how { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+@media (max-width: 760px) { .how { grid-template-columns: 1fr 1fr; } }
+.how .panel b { display: block; margin-bottom: 4px; }
+.how .panel { font-size: 14px; color: var(--muted); }
+
+/* ---- desk */
+.bar { display: flex; gap: 8px; margin-bottom: 12px; }
+.bar .btn[aria-pressed="true"] { border-color: var(--accent); color: var(--ink); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.card { display: flex; flex-direction: column; gap: 8px; }
+.card.do { border-top: 4px solid var(--warn); }
+.kind { font-size: 12px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
+.card h3 { margin: 0; font-size: 17px; }
+.card p { margin: 0; }
+.card img.pic { max-width: 100%; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); }
+.quote { color: var(--muted); font-style: italic; }
+ol { margin: 0; padding-left: 22px; }
+.card.do ol { background: var(--task); border-radius: 8px; padding: 8px 8px 8px 30px; }
+.acts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+.acts .opt { text-align: left; flex: 1 1 100%; }
+.acts .opt small { display: block; color: var(--muted); font-size: 13px; }
+.rec { font-size: 11px; color: var(--accent); margin-left: 6px; }
+textarea, input, select { width: 100%; font: inherit; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+.cbar { display: flex; gap: 6px; margin-top: 6px; }
+.answered { display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; margin-top: auto; }
+.stamp { font-weight: 600; } .stamp.keep { color: var(--good); } .stamp.wrong { color: var(--bad); } .stamp.later { color: var(--muted); }
+.age { flex-basis: 100%; font-size: 13px; color: var(--muted); }
+.age.stale { color: var(--bad); }
+.link { font: inherit; font-size: 13px; background: none; border: 0; color: var(--accent); cursor: pointer; padding: 0; }
+
+/* ---- board */
+.cols { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+@media (max-width: 860px) { .cols { grid-template-columns: 1fr; } }
+.col h3 { font-size: 13px; color: var(--muted); margin: 0 0 8px; text-transform: uppercase; letter-spacing: .05em; }
+.col .panel { margin-bottom: 8px; display: flex; flex-direction: column; gap: 6px; }
+.col .panel h4 { margin: 0; font-size: 15px; }
+.who { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); }
+.who .face { width: 26px; height: 26px; font-size: 11px; }
+.meta { font-size: 12px; color: var(--muted); }
+
+/* ---- forms (Recruit, Pin a job) */
+dialog { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); color: var(--ink); padding: 20px; width: min(460px, calc(100vw - 32px)); }
+dialog::backdrop { background: rgb(0 0 0 / .45); }
+dialog h3 { margin: 0 0 12px; }
+dialog label { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
+dialog .row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 16px; }
+dialog pre { white-space: pre-wrap; font-size: 12px; max-height: 220px; overflow: auto; background: var(--bg); padding: 8px; border-radius: 8px; }
+
+#toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 8px 14px; border-radius: 8px; opacity: 0; transition: opacity .2s; pointer-events: none; z-index: 10; }
+#toast.on { opacity: 1; }

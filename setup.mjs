@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // One-time setup: the director's name, where lab repos live on GitHub, and this copy made yours.
-//   node setup.mjs --director "<your name>" [--owner <github user or org>] [--runs "<what you run, one line>"] [--port 4800]
+//   node setup.mjs --director "<your name>" [--owner <github user or org>] [--runs "<what you run, one line>"] [--name HQ] [--port 4800]
 // Writes hq.json, fills the director into CLAUDE.md, and unhooks this copy from the kit's own repo so nothing you
 // write ever goes back to it. Safe to run again: it only changes what you pass.
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
@@ -11,9 +11,9 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const argv = process.argv.slice(2);
 const flag = (k) => { const i = argv.indexOf(k); return i < 0 ? undefined : (argv[i + 1] || ''); };
-const director = flag('--director'), owner = flag('--owner'), runs = flag('--runs'), port = flag('--port');
-if (!director && owner == null && runs == null && port == null) {
-  console.log('usage: node setup.mjs --director "<your name>" [--owner <github user or org>] [--runs "<what you run, one line>"] [--port 4800]');
+const director = flag('--director'), owner = flag('--owner'), runs = flag('--runs'), port = flag('--port'), name = flag('--name');
+if (!director && owner == null && runs == null && port == null && !name) {
+  console.log('usage: node setup.mjs --director "<your name>" [--owner <github user or org>] [--runs "<what you run, one line>"] [--name HQ] [--port 4800]');
   process.exit(2);
 }
 const git = (...a) => execFileSync('git', a, { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
@@ -24,8 +24,9 @@ const cfg = existsSync(cfgFile) ? JSON.parse(readFileSync(cfgFile, 'utf8')) : {}
 if (director) cfg.director = director.trim();
 if (owner != null) cfg.githubOwner = owner.trim();
 if (port) cfg.port = Number(port);
+if (name) cfg.name = name.trim();
 cfg.repoPrefix ??= 'lab-';
-writeFileSync(cfgFile, JSON.stringify({ director: cfg.director || '', githubOwner: cfg.githubOwner || '', repoPrefix: cfg.repoPrefix, port: cfg.port || 4800 }, null, 2) + '\n');
+writeFileSync(cfgFile, JSON.stringify({ name: cfg.name || 'HQ', director: cfg.director || '', githubOwner: cfg.githubOwner || '', repoPrefix: cfg.repoPrefix, port: cfg.port || 4800 }, null, 2) + '\n');
 said.push(`hq.json: director ${cfg.director || '(not set)'}, lab repos ${cfg.githubOwner ? `${cfg.githubOwner}/${cfg.repoPrefix}<lab>, private` : 'local only (no --owner)'}`);
 
 const claudeFile = path.join(ROOT, 'CLAUDE.md');
